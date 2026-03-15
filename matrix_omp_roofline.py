@@ -19,7 +19,8 @@ try:
                 peak_compute = 8 * max_ghz * 16
                 break
 except FileNotFoundError:
-    print("Error: feup_lscpu.txt not found.")
+    print("Error: feup_lscpu.txt not found. Using defaults.")
+    peak_compute = 665.6
 
 # Parse STREAM Memory Bandwidth
 try:
@@ -30,7 +31,8 @@ try:
                 peak_mem_bandwidth = mb_s / 1000.0
                 break
 except FileNotFoundError:
-    print("Error: feup_stream_benchmark.txt not found.")
+    print("Error: feup_stream_benchmark.txt not found. Using defaults.")
+    peak_mem_bandwidth = 29.31
 
 print(f"--> Extracted Peak Compute: {peak_compute:.1f} GFlop/s")
 print(f"--> Extracted Memory Bandwidth: {peak_mem_bandwidth:.2f} GB/s")
@@ -38,9 +40,14 @@ print(f"--> Extracted Memory Bandwidth: {peak_mem_bandwidth:.2f} GB/s")
 # ---------------------------------------------------------
 # 2. Dynamically get experimental max from benchmark CSV
 # ---------------------------------------------------------
-df = pd.read_csv('benchmark_results.csv')
-df_filtered = df[df['Run'] > 2] # Drop warm-ups
-experimental_perf = df_filtered['GFlops'].max() # Find the absolute best run
+try:
+    df = pd.read_csv('benchmark_results.csv')
+    df_filtered = df[df['Run'] > 2] # Drop warm-ups
+    experimental_perf = df_filtered['GFlops'].max() # Find the absolute best run
+except FileNotFoundError:
+    print("Error: benchmark_results.csv not found. Using dummy data.")
+    experimental_perf = 29.84
+    
 experimental_oi = 0.25 # Mathematically calculated for untiled i-k-j
 
 print(f"--> Max Achieved Performance: {experimental_perf:.2f} GFlop/s")
@@ -48,7 +55,7 @@ print(f"--> Max Achieved Performance: {experimental_perf:.2f} GFlop/s")
 # ---------------------------------------------------------
 # 3. Generate Roofline Data
 # ---------------------------------------------------------
-oi_axis = np.logspace(-2, 2, 500)
+oi_axis = np.logspace(-2, 3, 500)
 memory_roof = oi_axis * peak_mem_bandwidth
 compute_roof = np.full_like(oi_axis, peak_compute)
 actual_roofline = np.minimum(memory_roof, compute_roof)
@@ -60,6 +67,13 @@ plt.figure(figsize=(10, 6))
 
 # Plot the empirical hardware roofline
 plt.plot(oi_axis, actual_roofline, color='red', linewidth=2, label='Empirical Hardware Limit')
+
+# --- Label the specific Hardware Peak Limits on the graph ---
+plt.text(20, peak_compute * 1.2, f'Peak Compute: {peak_compute:.1f} GFlop/s', color='red', fontsize=10, fontweight='bold')
+
+x_pos = 0.1
+y_pos = x_pos * peak_mem_bandwidth
+plt.text(x_pos, y_pos * 1.3, f'Mem Bandwidth: {peak_mem_bandwidth:.2f} GB/s', color='red', fontsize=10, fontweight='bold')
 
 # Plot your specific matrix multiplication test result
 plt.plot(experimental_oi, experimental_perf, marker='o', markersize=10, color='#1f77b4', label='Actual Performance (Peak)')
@@ -76,7 +90,7 @@ plt.title('Empirical Roofline Model: Element-Line Multiplication (FEUP i7-14700T
 plt.xlabel('Operational Intensity (FLOPs/Byte)')
 plt.ylabel('Performance (GFlop/s)')
 
-plt.xlim(0.01, 100)
+plt.xlim(0.01, 1000)
 plt.ylim(1, 2000)
 
 plt.grid(True, which="both", ls="--", alpha=0.5)
