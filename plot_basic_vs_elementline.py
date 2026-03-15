@@ -4,7 +4,6 @@ import numpy as np
 
 # Load data (Excluding first 2 runs)
 df = pd.read_csv('energy_results.csv')
-
 df = df[df['Run'] >= 3]
 
 # Filter for Basic and Element-line
@@ -48,5 +47,7 @@ ax2.bar_label(bars3, fmt='%.2f', padding=3)
 ax2.bar_label(bars4, fmt='%.2f', padding=3)
 
 plt.tight_layout()
-plt.savefig('comparison_basic_vs_elementline.png', dpi=300)
+
+# Updated to PDF format
+plt.savefig('comparison_basic_vs_elementline.pdf')
 plt.show()

@@ -24,8 +24,8 @@ x = np.arange(len(sizes))
 width = 0.35
 
 # Plot 1 - Time comparison
-bars1 = ax1.bar(x - width/2, v2_time.values, width, label='Element-line (V2)', alpha=0.8)
-bars2 = ax1.bar(x + width/2, v3_time.values, width, label='Multithread (V3)', alpha=0.8)
+bars1 = ax1.bar(x - width/2, v2_time.values, width, label='Element-line ($V_2$)', alpha=0.8)
+bars2 = ax1.bar(x + width/2, v3_time.values, width, label='Multithread ($V_3$)', alpha=0.8)
 ax1.set_xlabel('Problem Size', fontsize=12)
 ax1.set_ylabel('Time (seconds)', fontsize=12)
 ax1.set_title('Element-line vs Multithread: Execution Time', fontsize=12, fontweight='bold')
@@ -37,8 +37,8 @@ ax1.bar_label(bars1, fmt='%.3f', padding=3)
 ax1.bar_label(bars2, fmt='%.3f', padding=3)
 
 # Plot 2 - Energy comparison
-bars3 = ax2.bar(x - width/2, v2_energy.values, width, label='Element-line (V2)', alpha=0.8)
-bars4 = ax2.bar(x + width/2, v3_energy.values, width, label='Multithread (V3)', alpha=0.8)
+bars3 = ax2.bar(x - width/2, v2_energy.values, width, label='Element-line ($V_2$)', alpha=0.8)
+bars4 = ax2.bar(x + width/2, v3_energy.values, width, label='Multithread ($V_3$)', alpha=0.8)
 ax2.set_xlabel('Problem Size', fontsize=12)
 ax2.set_ylabel('Energy (Joules)', fontsize=12)
 ax2.set_title('Element-line vs Multithread: Energy Consumption', fontsize=12, fontweight='bold')
@@ -50,5 +50,5 @@ ax2.bar_label(bars3, fmt='%.2f', padding=3)
 ax2.bar_label(bars4, fmt='%.2f', padding=3)
 
 plt.tight_layout()
-plt.savefig('comparison_elementline_vs_multithread.png', dpi=300)
-plt.show()
+# Changed extension to .pdf and removed dpi parameter for vector format
+plt.savefig('comparison_elementline_vs_multithread.pdf')
