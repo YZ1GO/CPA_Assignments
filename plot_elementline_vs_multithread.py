@@ -17,7 +17,7 @@ v2_energy = df_energy[df_energy['Version'] == 2].groupby('Size')['Energy_Joules'
 v3_energy = df_omp[df_omp['Version'] == 3].groupby('Size')['Energy_Joules'].mean()
 
 # Figure with 2 subplots
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
 
 sizes = v2_time.index.astype(str)
 x = np.arange(len(sizes))
@@ -50,5 +50,4 @@ ax2.bar_label(bars3, fmt='%.2f', padding=3)
 ax2.bar_label(bars4, fmt='%.2f', padding=3)
 
 plt.tight_layout()
-# Changed extension to .pdf and removed dpi parameter for vector format
 plt.savefig('comparison_elementline_vs_multithread.pdf')
