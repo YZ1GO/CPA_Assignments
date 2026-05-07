@@ -17,7 +17,9 @@ The goal is to evaluate performance, scalability, and efficiency across differen
 
 LU factorization decomposes a matrix `A` into:
 
-:contentReference[oaicite:0]{index=0}
+```math
+A=LU
+``` 
 
 Where:
 
@@ -26,7 +28,9 @@ Where:
 
 This decomposition is commonly used to solve systems of linear equations:
 
-:contentReference[oaicite:1]{index=1}
+```math
+Ax=b
+```
 
 The implemented algorithm uses an in-place formulation where:
 
@@ -34,8 +38,9 @@ The implemented algorithm uses an in-place formulation where:
 - Elements on and above the diagonal store `U`
 
 The computational complexity is:
-
-:contentReference[oaicite:2]{index=2}
+```math
+\Theta\left(\frac{2}{3}n^3\right)
+```
 
 ---
 
@@ -193,7 +198,9 @@ Metrics collected:
 
 ### Speedup
 
-:contentReference[oaicite:3]{index=3}
+```math
+S(P)=\frac{T(1)}{T(P)}
+``` 
 
 Where:
 - `T(1)` is sequential execution time
@@ -203,7 +210,9 @@ Where:
 
 ### Efficiency
 
-:contentReference[oaicite:4]{index=4}
+```math
+E(P)=\frac{S(P)}{P}
+```
 
 ---
 
