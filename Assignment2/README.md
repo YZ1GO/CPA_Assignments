@@ -225,7 +225,7 @@ python3 scripts/plot_results.py
 
 ## Current Status
 
-- [ ] Sequential LU
+- [X] Sequential LU
 - [ ] Blocked LU
 - [ ] OpenMP LU
 - [ ] SYCL LU
@@ -237,8 +237,10 @@ python3 scripts/plot_results.py
 
 ## Authors
 
-Bruno Huang 202207517
-Francisco Fernandes 202104843
-Francisco Mendonça 202006728
+| Name | Student Number |
+|---|---|
+| Bruno Huang | 202207517 |
+| Francisco Fernandes | 202104843 |
+| Francisco Mendonça | 202006728 |
 
 Project developed for the advanced parallel computing class.
