@@ -2,6 +2,7 @@
 #include <string>
 #include <cstdlib>
 #include <vector>
+#include <iomanip>
 
 #include "matrix.hpp"
 #include "lu.hpp"
@@ -39,21 +40,34 @@ int main(int argc, char** argv) {
 
         Matrix A_seq = A_base;
         Matrix A_blk = A_base;
+        Matrix A_omp_loop = A_base;
+        Matrix A_omp_task = A_base;
+
+        int block_size = 64;
 
         Timer timer_seq;
         timer_seq.start();
         lu_sequential(A_seq);
         double time_seq = timer_seq.stop();
-        std::cout << "Sequential LU completed in  " << time_seq << " seconds\n";
+        std::cout << "[1] Sequential LU:  " << std::fixed << std::setprecision(4) << time_seq << " s\n";
 
-        int block_size = 64;
         Timer timer_blk;
         timer_blk.start();
         lu_blocked(A_blk, block_size);
         double time_blk = timer_blk.stop();
-        std::cout << "Blocked LU (" << block_size << ") completed in " << time_blk << " seconds\n";
+        std::cout << "[2] Blocked LU:     " << time_blk << " s  | Speedup: " << time_seq / time_blk << "x\n";
 
-        std::cout << "Speedup: " << time_seq / time_blk << "x faster\n";
+        Timer timer_omp_loop;
+        timer_omp_loop.start();
+        lu_openmp_loop(A_omp_loop, block_size);
+        double time_omp_loop = timer_omp_loop.stop();
+        std::cout << "[3] OpenMP (Loop):  " << time_omp_loop << " s  | Speedup: " << time_seq / time_omp_loop << "x\n";
+
+        Timer timer_omp_task;
+        timer_omp_task.start();
+        lu_openmp_task(A_omp_task, block_size);
+        double time_omp_task = timer_omp_task.stop();
+        std::cout << "[4] OpenMP (Tasks): " << time_omp_task << " s  | Speedup: " << time_seq / time_omp_task << "x\n";
     }
 
     return 0;

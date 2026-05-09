@@ -8,7 +8,8 @@ SRC_COMMON = \
 	src/timer.cpp \
 	src/lu_sequential.cpp \
 	src/lu_blocked.cpp \
-	src/lu_openmp.cpp
+	src/lu_openmp_loop.cpp \
+	src/lu_openmp_task.cpp
 
 SRC_MAIN = \
 	src/main.cpp
