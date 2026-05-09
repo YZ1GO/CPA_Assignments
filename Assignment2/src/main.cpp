@@ -34,15 +34,26 @@ int main(int argc, char** argv) {
     for (int n : sizes) {
         std::cout << "\nMatrix size: " << n << "x" << n << "\n";
 
-        Matrix A(n);
-        A.randomize();
+        Matrix A_base(n);
+        A_base.randomize();
 
-        Timer timer;
-        timer.start();
-        lu_sequential(A);
-        double time = timer.stop();
+        Matrix A_seq = A_base;
+        Matrix A_blk = A_base;
 
-        std::cout << "Sequential LU factorization completed in " << time << " seconds\n";
+        Timer timer_seq;
+        timer_seq.start();
+        lu_sequential(A_seq);
+        double time_seq = timer_seq.stop();
+        std::cout << "Sequential LU completed in  " << time_seq << " seconds\n";
+
+        int block_size = 64;
+        Timer timer_blk;
+        timer_blk.start();
+        lu_blocked(A_blk, block_size);
+        double time_blk = timer_blk.stop();
+        std::cout << "Blocked LU (" << block_size << ") completed in " << time_blk << " seconds\n";
+
+        std::cout << "Speedup: " << time_seq / time_blk << "x faster\n";
     }
 
     return 0;
