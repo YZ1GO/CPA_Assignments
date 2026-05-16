@@ -32,6 +32,11 @@ int main(int argc, char** argv) {
 
     std::cout << "LU Factorization Project\n";
 
+    // Initialize SYCL device selection before timing starts
+    if (lu_sycl_available()) {
+        init_sycl_device();
+    }
+
     for (int n : sizes) {
         std::cout << "\nMatrix size: " << n << "x" << n << "\n";
 
@@ -42,6 +47,7 @@ int main(int argc, char** argv) {
         Matrix A_blk = A_base;
         Matrix A_omp_loop = A_base;
         Matrix A_omp_task = A_base;
+        Matrix A_sycl = A_base;
 
         int block_size = 64;
 
@@ -68,6 +74,16 @@ int main(int argc, char** argv) {
         lu_openmp_task(A_omp_task, block_size);
         double time_omp_task = timer_omp_task.stop();
         std::cout << "[4] OpenMP (Tasks): " << time_omp_task << " s  | Speedup: " << time_seq / time_omp_task << "x\n";
+
+        if (lu_sycl_available()) {
+            Timer timer_sycl;
+            timer_sycl.start();
+            lu_sycl(A_sycl);
+            double time_sycl = timer_sycl.stop();
+            std::cout << "[5] SYCL:           " << time_sycl << " s  | Speedup: " << time_seq / time_sycl << "x\n";
+        } else {
+            std::cout << "[5] SYCL:           unavailable in this build\n";
+        }
     }
 
     return 0;
