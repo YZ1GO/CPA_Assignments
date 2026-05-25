@@ -116,7 +116,7 @@ SYCL implementation capable of running on:
 - Integrated GPU (iGPU)
 - Other SYCL-compatible accelerators
 
-The program enumerates available SYCL platforms and lets the user select the target device at runtime.
+The program explicitly implements targeting for both the CPU (`sycl::cpu_selector_v`) and the iGPU (`sycl::gpu_selector_v`). The user can choose to benchmark them together or isolate them independently via command-line arguments.
 
 ---
 
@@ -131,15 +131,48 @@ The program enumerates available SYCL platforms and lets the user select the tar
 Examples:
 - GCC
 - Clang
-- Intel oneAPI DPC++
+- Intel oneAPI DPC++ (Required for `make sycl`)
 - AdaptiveCpp
+
+### Intel oneAPI DPC++ Setup (Ubuntu)
+
+To compile the SYCL version, the Intel oneAPI DPC++ compiler (`icpx`) is required.
+
+**Installation commands:**
+```bash
+wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+sudo apt update
+sudo apt install intel-oneapi-compiler-dpcpp-cpp
+```
+
+> [!NOTE]
+> If you encounter a `C++ header location not resolved` error when compiling `make sycl`, it means the Clang-based `icpx` compiler cannot find your system's C++ standard library. You can fix this by installing the dev headers:
+> ```bash
+> sudo apt install libstdc++-12-dev libstdc++-11-dev
+> ```
+
+Before running the compiler, remember to load the environment variables:
+```bash
+source /opt/intel/oneapi/setvars.sh
+```
+
+**Uninstallation commands:**
+To remove the compiler and repository after you are done with the assignment:
+```bash
+sudo apt remove --purge intel-oneapi-compiler-dpcpp-cpp
+sudo rm /etc/apt/sources.list.d/oneAPI.list
+sudo rm /usr/share/keyrings/oneapi-archive-keyring.gpg
+sudo apt update
+```
 
 ---
 
 ### Compile
 
 ```bash
-make clean && make
+make clean && make main  # Compiles Sequential and OpenMP versions
+make sycl                # Compiles the SYCL version (requires icpx to be installed and sourced)
 ```
 
 ---
@@ -148,18 +181,36 @@ make clean && make
 
 ### Main executable
 
-Runs sequential LU factorization on matrices of specified size(s).
+Runs the LU factorization algorithms on matrices of specified size(s). You can specify which algorithm to run to save time.
+
+> [!IMPORTANT]
+> The project compiles into two separate binaries:
+> - `./build/lu`: Compiled using standard `g++`. Includes algorithms 1 through 4. It skips SYCL code, meaning it can run on any machine.
+> - `./build/lu_sycl`: Compiled using Intel `icpx`. Includes all algorithms (1 through 6). You **must** use this binary if you want to run the SYCL tests.
 
 ```bash
-./build/lu <matrix_size>    # Single matrix size
-./build/lu                  # Benchmark range: 1024 to 8192, step 1024
+./build/lu_sycl [algorithm_id] [matrix_size]
 ```
 
-Examples:
+**Algorithm IDs:**
+- `0`: Run ALL algorithms (Default)
+- `1`: Sequential LU
+- `2`: Blocked LU
+- `3`: OpenMP (Loop)
+- `4`: OpenMP (Tasks)
+- `5`: SYCL (CPU)
+- `6`: SYCL (iGPU)
+
+**Examples:**
 ```bash
-./build/lu 100              # Test 100x100 matrix
-./build/lu                  # Run full benchmark suite
+./build/lu              # Run ALL algorithms on the full benchmark range (1024-8192)
+./build/lu 0 2048       # Run ALL algorithms on a 2048x2048 matrix
+./build/lu 4            # Run ONLY OpenMP Tasks on the full benchmark range
+./build/lu_sycl 6 4096  # Run ONLY SYCL iGPU on a 4096x4096 matrix (use ./build/lu_sycl instead of ./build/lu)
 ```
+
+> [!NOTE]
+> When you run a single parallel algorithm (e.g., ID 2-6), its `Speedup` will print as `0.0x` because it skips the sequential baseline to save time. If you use ID `0` to run all algorithms, it correctly calculates all speedups relative to the sequential execution
 
 ---
 
@@ -235,9 +286,9 @@ python3 scripts/plot_results.py
 ## Current Status
 
 - [X] Sequential LU
-- [ ] Blocked LU
-- [ ] OpenMP LU
-- [ ] SYCL LU
+- [X] Blocked LU
+- [X] OpenMP LU
+- [X] SYCL LU
 - [ ] Benchmark automation
 - [ ] Plot generation
 - [ ] Performance report
