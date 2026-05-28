@@ -40,6 +40,11 @@ benchmark:
 	$(SRC_COMMON) $(SRC_BENCH) \
 	-o $(TARGET_BENCH)
 
+benchmark_sycl:
+	$(SYCL_CXX) -O3 -std=c++17 -fsycl -DUSE_SYCL -Iinclude \
+	$(SRC_COMMON) $(SRC_SYCL) $(SRC_BENCH) \
+	-o build/benchmark_sycl
+
 sycl:
 	$(SYCL_CXX) -O3 -std=c++17 -fsycl -DUSE_SYCL -Iinclude \
 	$(SRC_COMMON) $(SRC_SYCL) $(SRC_MAIN) \

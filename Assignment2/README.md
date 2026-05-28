@@ -216,15 +216,20 @@ Runs the LU factorization algorithms on matrices of specified size(s). You can s
 
 ### Benchmarks
 
+The benchmarking infrastructure isolates testing for individual algorithms to prevent massive execution times. For each matrix size, it runs **5 separate iterations** and computes the average execution time to ensure statistically accurate and smooth results.
+
+To run a benchmark, use the automated bash script and provide the algorithm ID:
 ```bash
-./build/benchmark
+bash scripts/run_benchmarks.sh <algorithm_id>
 ```
 
-Or:
-
+**Examples:**
 ```bash
-bash scripts/run_benchmarks.sh
+bash scripts/run_benchmarks.sh 1   # Run Sequential benchmark, save to results/
+bash scripts/run_benchmarks.sh 6   # Run SYCL iGPU benchmark, save to results/
 ```
+
+The script will automatically compile the correct target (using `g++` or `icpx`) and save the perfectly formatted `size,time` CSV data into the `results/` folder (e.g., `results/benchmark_algo_6_20260528_153000.csv`).
 
 ---
 

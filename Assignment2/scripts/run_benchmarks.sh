@@ -6,7 +6,20 @@ set -e
 cd "$(dirname "$0")/.."
 
 RESULTS_DIR="results"
-BENCH_EXEC="./build/benchmark"
+
+if [ -z "$1" ]; then
+    echo "Usage: ./scripts/run_benchmarks.sh <algorithm_id>"
+    echo "Algorithm IDs:"
+    echo "  1: Sequential"
+    echo "  2: Blocked"
+    echo "  3: OpenMP (Loop)"
+    echo "  4: OpenMP (Tasks)"
+    echo "  5: SYCL (CPU)"
+    echo "  6: SYCL (iGPU)"
+    exit 1
+fi
+
+ALGO_ID=$1
 
 echo "========================================="
 echo "Shared Memory LU Benchmark Runner"
@@ -16,20 +29,36 @@ echo
 mkdir -p build
 mkdir -p $RESULTS_DIR
 
-echo "[1/2] Building project..."
-make benchmark
+if [ "$ALGO_ID" -ge 5 ]; then
+    echo "[1/2] Building project with SYCL support..."
+    
+    # Auto-source the Intel oneAPI vars if icpx is not found
+    if ! command -v icpx &> /dev/null; then
+        if [ -f "/opt/intel/oneapi/setvars.sh" ]; then
+            echo "Auto-sourcing Intel oneAPI variables..."
+            source /opt/intel/oneapi/setvars.sh > /dev/null 2>&1
+        fi
+    fi
+    
+    make benchmark_sycl
+    BENCH_EXEC="./build/benchmark_sycl"
+else
+    echo "[1/2] Building project..."
+    make benchmark
+    BENCH_EXEC="./build/benchmark"
+fi
 
 echo
-echo "[2/2] Running benchmarks..."
+echo "[2/2] Running benchmark for algorithm ID: $ALGO_ID..."
 echo
 
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_FILE="$RESULTS_DIR/benchmark_$TIMESTAMP.csv"
+OUTPUT_FILE="$RESULTS_DIR/benchmark_algo_${ALGO_ID}_${TIMESTAMP}.csv"
 
-stdbuf -oL "$BENCH_EXEC" | tee "$OUTPUT_FILE"
+stdbuf -oL "$BENCH_EXEC" $ALGO_ID | tee "$OUTPUT_FILE"
 
 echo
 echo "Benchmark completed"
-echo "Results: $OUTPUT_FILE"
+echo "Results saved to: $OUTPUT_FILE"
 echo
 echo "Done."
