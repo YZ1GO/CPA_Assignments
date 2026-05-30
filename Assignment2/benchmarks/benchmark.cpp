@@ -2,10 +2,21 @@
 #include <vector>
 #include <iomanip>
 #include <cstdlib>
+#include <fstream>
+#include <string>
 
 #include "matrix.hpp"
 #include "lu.hpp"
 #include "timer.hpp"
+
+// Helper to read RAPL energy in microjoules
+uint64_t get_energy_uj() {
+    std::ifstream file("/sys/class/powercap/intel-rapl:0/energy_uj");
+    if (!file.is_open()) return 0;
+    uint64_t energy = 0;
+    file >> energy;
+    return energy;
+}
 
 int main(int argc, char** argv) {
     if (argc != 2) {
@@ -29,11 +40,12 @@ int main(int argc, char** argv) {
     }
 
     // Print CSV header and enable immediate flushing
-    std::cout << "size,time\n";
+    std::cout << "size,time,energy\n";
     std::cout << std::unitbuf;
 
     for (int n : sizes) {
         double total_time = 0.0;
+        double total_energy = 0.0;
         bool success = true;
         int num_iterations = 5;
 
@@ -42,6 +54,8 @@ int main(int argc, char** argv) {
             A.randomize();
             double time = 0.0;
             Timer timer;
+            
+            uint64_t start_energy = get_energy_uj();
 
             switch(algo_choice) {
                 case 1:
@@ -97,14 +111,22 @@ int main(int argc, char** argv) {
                     return 1;
             }
 
+            uint64_t end_energy = get_energy_uj();
+
             if (!success) break; // Don't run remaining iterations if it failed
+            
             total_time += time;
+            if (end_energy >= start_energy && start_energy > 0) {
+                total_energy += (end_energy - start_energy) / 1000000.0; // Convert uJ to Joules
+            }
         }
 
         if (success) {
-            std::cout << n << "," << std::fixed << std::setprecision(6) << (total_time / num_iterations) << "\n";
+            std::cout << n << "," 
+                      << std::fixed << std::setprecision(6) << (total_time / num_iterations) << ","
+                      << std::fixed << std::setprecision(2) << (total_energy / num_iterations) << "\n";
         } else {
-            std::cout << n << ",0.0\n";
+            std::cout << n << ",0.0,0.0\n";
         }
     }
 

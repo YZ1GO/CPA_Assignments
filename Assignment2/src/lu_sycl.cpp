@@ -8,7 +8,7 @@ void lu_sycl(Matrix& A, int block_size, sycl::queue& q) {
 
     // Create a buffer for the matrix data.
     // The buffer automatically manages data transfer between the host and the device.
-    sycl::buffer<double, 1> buf_A(A.data.data(), sycl::range<1>(A.data.size()));
+    sycl::buffer<real_t, 1> buf_A(A.data.data(), sycl::range<1>(A.data.size()));
 
     for (int k = 0; k < n; k += block_size) {
         int end_k = std::min(n, k + block_size);
@@ -23,7 +23,7 @@ void lu_sycl(Matrix& A, int block_size, sycl::queue& q) {
                 for (int kk = k; kk < end_k; ++kk) {
                     for (int i = kk + 1; i < end_k; ++i) {
                         dev_A[i * n + kk] = dev_A[i * n + kk] / dev_A[kk * n + kk];
-                        double L_ikk = dev_A[i * n + kk];
+                        real_t L_ikk = dev_A[i * n + kk];
                         for (int j = kk + 1; j < end_k; ++j) {
                             dev_A[i * n + j] = dev_A[i * n + j] - L_ikk * dev_A[kk * n + j];
                         }
@@ -40,7 +40,7 @@ void lu_sycl(Matrix& A, int block_size, sycl::queue& q) {
             cgh.single_task([=]() {
                 for (int kk = k; kk < end_k; ++kk) {
                     for (int i = k; i < kk; ++i) {
-                        double L_kki = dev_A[kk * n + i];
+                        real_t L_kki = dev_A[kk * n + i];
                         for (int j = end_k; j < n; ++j) {
                             dev_A[kk * n + j] = dev_A[kk * n + j] - L_kki * dev_A[i * n + j];
                         }
@@ -58,7 +58,7 @@ void lu_sycl(Matrix& A, int block_size, sycl::queue& q) {
                 cgh.parallel_for(sycl::range<1>(n - end_k), [=](sycl::id<1> idx) {
                     int i = end_k + idx[0];
                     for (int kk = k; kk < end_k; ++kk) {
-                        double sum = 0.0;
+                        real_t sum = 0.0;
                         for (int j = k; j < kk; ++j) {
                             sum += dev_A[i * n + j] * dev_A[j * n + kk];
                         }
@@ -77,7 +77,7 @@ void lu_sycl(Matrix& A, int block_size, sycl::queue& q) {
                 cgh.parallel_for(sycl::range<1>(n - end_k), [=](sycl::id<1> idx) {
                     int i = end_k + idx[0];
                     for (int kk = k; kk < end_k; ++kk) {
-                        double L_ikk = dev_A[i * n + kk];
+                        real_t L_ikk = dev_A[i * n + kk];
                         for (int j = end_k; j < n; ++j) {
                             dev_A[i * n + j] = dev_A[i * n + j] - L_ikk * dev_A[kk * n + j];
                         }

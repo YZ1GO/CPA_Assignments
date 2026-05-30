@@ -68,6 +68,17 @@ echo "Shared Memory LU Benchmark Runner"
 echo "========================================="
 echo
 
+# Check if RAPL is accessible for energy tracking
+RAPL_FILE="/sys/class/powercap/intel-rapl:0/energy_uj"
+if [ -f "$RAPL_FILE" ] && [ ! -r "$RAPL_FILE" ]; then
+    echo "[WARNING] Cannot read energy counters!"
+    echo "To track energy consumption, please cancel this script and run:"
+    echo "  sudo chmod -R a+r /sys/class/powercap/intel-rapl"
+    echo
+    echo "Continuing without energy tracking in 3 seconds..."
+    sleep 3
+fi
+
 if [ "$ALGO_ID" -eq 7 ]; then
     echo "Option 7 selected. Running ALL benchmarks (1 through 6)..."
     echo "========================================="

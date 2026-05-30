@@ -25,7 +25,7 @@ void lu_openmp_task(Matrix& A, int block_size) {
                 for (int kk = k; kk < end_k; ++kk) {
                     for (int i = kk + 1; i < end_k; ++i) {
                         A(i, kk) = A(i, kk) / A(kk, kk);
-                        double L_ikk = A(i, kk);
+                        real_t L_ikk = A(i, kk);
                         for (int j = kk + 1; j < end_k; ++j) {
                             A(i, j) = A(i, j) - L_ikk * A(kk, j);
                         }
@@ -43,7 +43,7 @@ void lu_openmp_task(Matrix& A, int block_size) {
                 {
                     for (int kk = k; kk < end_k; ++kk) {
                         for (int i = k; i < kk; ++i) {
-                            double L_kki = A(kk, i);
+                            real_t L_kki = A(kk, i);
                             for (int jj = j; jj < end_j; ++jj) {
                                 A(kk, jj) = A(kk, jj) - L_kki * A(i, jj);
                             }
@@ -62,7 +62,7 @@ void lu_openmp_task(Matrix& A, int block_size) {
                 {
                     for (int ii = i; ii < end_i; ++ii) {
                         for (int kk = k; kk < end_k; ++kk) {
-                            double sum = 0.0;
+                            real_t sum = 0.0;
                             for (int jj = k; jj < kk; ++jj) {
                                 sum += A(ii, jj) * A(jj, kk);
                             }
@@ -84,7 +84,7 @@ void lu_openmp_task(Matrix& A, int block_size) {
                     {
                         for (int ii = i; ii < end_i; ++ii) {
                             for (int kk = k; kk < end_k; ++kk) {
-                                double L_ikk = A(ii, kk);
+                                real_t L_ikk = A(ii, kk);
                                 for (int jj = j; jj < end_j; ++jj) {
                                     A(ii, jj) = A(ii, jj) - L_ikk * A(kk, jj);
                                 }

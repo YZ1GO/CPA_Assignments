@@ -30,22 +30,22 @@ directories:
 	mkdir -p build
 	mkdir -p results
 
-main:
+main: directories
 	$(CXX) $(CXXFLAGS) \
 	$(SRC_COMMON) $(SRC_MAIN) \
 	-o $(TARGET_MAIN)
 
-benchmark:
+benchmark: directories
 	$(CXX) $(CXXFLAGS) \
 	$(SRC_COMMON) $(SRC_BENCH) \
 	-o $(TARGET_BENCH)
 
-benchmark_sycl:
+benchmark_sycl: directories
 	$(SYCL_CXX) -O3 -std=c++17 -fsycl -DUSE_SYCL -Iinclude \
 	$(SRC_COMMON) $(SRC_SYCL) $(SRC_BENCH) \
 	-o build/benchmark_sycl
 
-sycl:
+sycl: directories
 	$(SYCL_CXX) -O3 -std=c++17 -fsycl -DUSE_SYCL -Iinclude \
 	$(SRC_COMMON) $(SRC_SYCL) $(SRC_MAIN) \
 	-o $(TARGET_SYCL)
