@@ -101,7 +101,7 @@ def main():
     ax_time.set_ylabel('Time (Seconds)')
     ax_time.grid(True, linestyle='--', alpha=0.7)
     ax_time.legend()
-    fig_time.savefig(os.path.join(RESULTS_DIR, 'plot_time.pdf'), bbox_inches='tight')
+    fig_time.savefig(os.path.join(RESULTS_DIR, 'plot_time.jpeg'), bbox_inches='tight')
 
     # Configure Speedup Plot
     ax_speedup.set_title('Speedup vs Matrix Size (Baseline: Sequential)')
@@ -110,7 +110,7 @@ def main():
     ax_speedup.axhline(y=1.0, color='r', linestyle='--', alpha=0.5) # Baseline reference
     ax_speedup.grid(True, linestyle='--', alpha=0.7)
     ax_speedup.legend()
-    fig_speedup.savefig(os.path.join(RESULTS_DIR, 'plot_speedup.pdf'), bbox_inches='tight')
+    fig_speedup.savefig(os.path.join(RESULTS_DIR, 'plot_speedup.jpeg'), bbox_inches='tight')
 
     # Configure Efficiency Plot
     ax_eff.set_title(f'Efficiency vs Matrix Size (Assumes P={NUM_CORES} cores)')
@@ -118,7 +118,7 @@ def main():
     ax_eff.set_ylabel('Efficiency (Speedup / P)')
     ax_eff.grid(True, linestyle='--', alpha=0.7)
     ax_eff.legend()
-    fig_eff.savefig(os.path.join(RESULTS_DIR, 'plot_efficiency.pdf'), bbox_inches='tight')
+    fig_eff.savefig(os.path.join(RESULTS_DIR, 'plot_efficiency.jpeg'), bbox_inches='tight')
 
     # Configure Energy Plot
     ax_energy.set_title('Energy Consumption vs Matrix Size')
@@ -126,13 +126,13 @@ def main():
     ax_energy.set_ylabel('Energy (Joules)')
     ax_energy.grid(True, linestyle='--', alpha=0.7)
     ax_energy.legend()
-    fig_energy.savefig(os.path.join(RESULTS_DIR, 'plot_energy.pdf'), bbox_inches='tight')
+    fig_energy.savefig(os.path.join(RESULTS_DIR, 'plot_energy.jpeg'), bbox_inches='tight')
 
     print("\nGraphs successfully generated in the 'results/' directory:")
-    print(" - plot_time.pdf")
-    print(" - plot_speedup.pdf")
-    print(" - plot_efficiency.pdf")
-    print(" - plot_energy.pdf")
+    print(" - plot_time.jpeg")
+    print(" - plot_speedup.jpeg")
+    print(" - plot_efficiency.jpeg")
+    print(" - plot_energy.jpeg")
 
 if __name__ == "__main__":
     main()
